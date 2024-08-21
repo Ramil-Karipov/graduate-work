@@ -1,7 +1,6 @@
 package ru.skypro.homework.dto;
 
 import lombok.Data;
-import ru.skypro.homework.model.CommentModel;
 
 import java.util.List;
 
@@ -9,5 +8,5 @@ import java.util.List;
 public class CommentsDTO {
 
     private int count;
-    private List<CommentModel> results;
+    private List<CommentDTO> results;
 }

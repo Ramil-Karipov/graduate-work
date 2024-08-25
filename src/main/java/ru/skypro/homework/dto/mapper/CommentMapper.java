@@ -12,10 +12,10 @@ public class CommentMapper {
 
     public CommentDTO mapCommentModelToCommentDTO(CommentModel commentModel) {
         CommentDTO properties = new CommentDTO();
-        properties.setAuthor(commentModel.getAd().getUser().getId());
+        properties.setId(commentModel.getAd().getUser().getId());
         properties.setAuthorImage(commentModel.getAd().getUser().getImage());
         properties.setAuthorFirstName(commentModel.getAd().getUser().getFirstName());
-        properties.setCreatedAt(commentModel.getCreatedAt().getTime());
+        properties.setCreatedAd(commentModel.getCreatedAd().getTime());
         properties.setPk(commentModel.getId());
         properties.setText(commentModel.getText());
         return properties;

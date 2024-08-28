@@ -1,31 +1,30 @@
 package ru.skypro.homework.service;
 
 import org.springframework.data.domain.Sort;
-import ru.skypro.homework.dto.AdsDTO;
-import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
-import ru.skypro.homework.dto.FullAdsDto;
-import ru.skypro.homework.model.AdModel;
-import ru.skypro.homework.model.ImagesModel;
+import ru.skypro.homework.models.dto.AdsDto;
+import ru.skypro.homework.models.dto.CreateAdsDto;
+import ru.skypro.homework.models.dto.FullAdsDto;
+import ru.skypro.homework.models.entity.Ads;
+import ru.skypro.homework.models.entity.Images;
 
 import java.util.List;
 
 public interface AdsService {
 
-    List<AdsDTO> getALLAds();
+    List<AdsDto> getALLAds();
 
-    AdsDTO addAds(CreateOrUpdateAdDTO ads, ImagesModel image);
+    AdsDto addAds(CreateAdsDto ads, Images image);
 
-    List<AdsDTO> getAdsMe(Boolean authenticated, String authority, Object credentials, Object details, Object principal);
+    List<AdsDto> getAdsMe(Boolean authenticated, String authority, Object credentials, Object details, Object principal);
 
     void removeAds(Integer id);
 
     FullAdsDto getFullAds(Integer id);
 
-    AdsDTO updateAds(Integer id, CreateOrUpdateAdDTO ads);
+    AdsDto updateAds(Integer id, CreateAdsDto ads);
 
-    AdModel getAds(Integer id);
+    Ads getAds(Integer id);
 
-    List<AdsDTO> findAds(String title);
+    List<AdsDto> findAds(String title, Sort.Direction order);
 
-    List<AdsDTO> getSortedAds(Sort.Direction order);
 }

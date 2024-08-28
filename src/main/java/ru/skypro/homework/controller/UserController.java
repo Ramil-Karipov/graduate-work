@@ -3,109 +3,102 @@ package ru.skypro.homework.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.dto.NewPasswordDTO;
-import ru.skypro.homework.dto.UpdateUserDTO;
-import ru.skypro.homework.dto.UserDTO;
+import ru.skypro.homework.models.dto.CreateUserDto;
+import ru.skypro.homework.models.dto.NewPasswordDto;
+import ru.skypro.homework.models.dto.ResponseWrapper;
+import ru.skypro.homework.models.dto.UserDto;
+import ru.skypro.homework.service.UserService;
 
-import javax.validation.Valid;
 
+@Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
-@RequestMapping("/users")
+@RequiredArgsConstructor
+@RequestMapping("users")
 public class UserController {
 
-    @Operation(
-            summary = "Обновление пароля",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "OK"
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden"
-                    )
-            }, tags = "Пользователи"
-    )
-    @PostMapping("/set_password")
-    public ResponseEntity<?> setPassword(@Valid @RequestBody NewPasswordDTO newPassword) {
-        return ResponseEntity.ok().build();
+    private final UserService userService;
+
+    @Operation(summary = "addUser", description = "", tags = {"Пользователи"}) //todo description
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = CreateUserDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")})
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping
+    public ResponseEntity<CreateUserDto> addUser(@RequestBody CreateUserDto user) {
+        CreateUserDto result = userService.addUser(user);
+
+        return ResponseEntity.ok(result);
     }
 
-    @Operation(
-            summary = "Получение информации об авторизованном пользователе",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "OK",
-                            content = {
-                                    @Content(
-                                            mediaType = "application/json",
-                                            schema = @Schema(implementation = UserDTO.class)
-                                    )
-                            }
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    )
-            }, tags = "Пользователи"
-    )
-    @GetMapping("/me")
-    public ResponseEntity<UserDTO> getUser() {
-        return new ResponseEntity<>(new UserDTO(), HttpStatus.OK);
+    @Operation(summary = "updateUser", description = "", tags = {"Пользователи"}) //todo description
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")})
+
+    @PatchMapping("me")
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (user.getEmail() == null || !userService.isAdmin(authentication)) {
+            user.setEmail(authentication.getName());
+        }
+
+        UserDto result = userService.updateUser(user);
+        return ResponseEntity.ok(result);
     }
 
-    @Operation(
-            summary = "Обновление информации об авторизованном пользователе",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "OK",
-                            content = {
-                                    @Content(
-                                            mediaType = "application/json",
-                                            schema = @Schema(implementation = UpdateUserDTO.class)
-                                    )
-                            }
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    )
-            }, tags = "Пользователи"
-    )
-    @PatchMapping("/me")
-    public ResponseEntity<UpdateUserDTO> updateUser(@Valid @RequestBody UpdateUserDTO update) {
-        return new ResponseEntity<>(new UpdateUserDTO(), HttpStatus.OK);
+    @Operation(summary = "getUser", description = "", tags = {"Пользователи"}) //todo description
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = ResponseWrapper.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not Found")})
+    @GetMapping("me")
+    public ResponseEntity<UserDto> getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDto result = userService.getUserDto(authentication.getName());
+
+        return ResponseEntity.ok(result);
     }
 
-    @Operation(
-            summary = "Обновление аватара авторизованного пользователя",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "OK"
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized"
-                    )
-            }, tags = "Пользователи"
-    )
-    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/me/image")
-    public ResponseEntity<?> updateUserImage(@RequestBody MultipartFile image) {
-        return ResponseEntity.ok().build();
+    @Operation(summary = "setPassword", description = "", tags = {"Пользователи"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = NewPasswordDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not Found")})
+
+    @PostMapping("set_password")
+    public ResponseEntity<NewPasswordDto> setPassword(@RequestBody NewPasswordDto newPassword) {
+        NewPasswordDto result = userService.setPassword(newPassword);
+
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "getUserDto", description = "", tags = {"Пользователи"}) //todo description
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "*/*", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not Found")})
+
+    @GetMapping("{id}")
+    public ResponseEntity<UserDto> getUser(@PathVariable Integer id) {
+        UserDto result = userService.getUserDto(id);
+
+        return ResponseEntity.ok(result);
     }
 }

@@ -1,23 +1,30 @@
 package ru.skypro.homework.service;
 
-
-import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
-import ru.skypro.homework.dto.NewPasswordDTO;
-import ru.skypro.homework.model.UserModel;
+import org.springframework.security.core.Authentication;
+import ru.skypro.homework.models.dto.CreateUserDto;
+import ru.skypro.homework.models.dto.NewPasswordDto;
+import ru.skypro.homework.models.dto.UserDto;
+import ru.skypro.homework.models.entity.User;
 
 import java.util.List;
 
 public interface UserService {
-    CreateOrUpdateAdDTO addUser(CreateOrUpdateAdDTO user);
 
-    List<UserModel> getUsers();
+    CreateUserDto addUser(CreateUserDto user);
 
-    UserModel updateUser(UserModel userModel);
+    List<UserDto> getUsers();
 
-    NewPasswordDTO setPassword(NewPasswordDTO newPassword);
+    UserDto updateUser(UserDto user);
 
-    UserModel getUserDto(Integer id);
+    NewPasswordDto setPassword(NewPasswordDto newPassword);
 
-    UserModel getUser(Integer id);
+    User getUser(Integer id);
 
+    UserDto getUserDto(Integer id);
+
+    User getUser(String username);
+
+    UserDto getUserDto(String username);
+
+    boolean isAdmin(Authentication authentication);
 }

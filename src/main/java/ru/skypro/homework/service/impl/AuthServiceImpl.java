@@ -2,22 +2,29 @@ package ru.skypro.homework.service.impl;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
-import ru.skypro.homework.dto.Register;
+import ru.skypro.homework.models.dto.RegisterReq;
+import ru.skypro.homework.models.dto.Role;
+import ru.skypro.homework.models.dto.UserDto;
 import ru.skypro.homework.service.AuthService;
+import ru.skypro.homework.service.UserService;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserDetailsManager manager;
+
     private final PasswordEncoder encoder;
 
-    public AuthServiceImpl(UserDetailsManager manager,
-                           PasswordEncoder passwordEncoder) {
+    private final UserService userService;
+
+    public AuthServiceImpl(UserDetailsManager manager, UserService userService) {
         this.manager = manager;
-        this.encoder = passwordEncoder;
+        this.encoder = new BCryptPasswordEncoder();
+        this.userService = userService;
     }
 
     @Override
@@ -26,22 +33,32 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
         UserDetails userDetails = manager.loadUserByUsername(userName);
-        return encoder.matches(password, userDetails.getPassword());
+        String encryptedPassword = userDetails.getPassword();
+        return encoder.matches(password, encryptedPassword);
     }
 
     @Override
-    public boolean register(Register register) {
-        if (manager.userExists(register.getUsername())) {
+    public boolean register(RegisterReq registerReq, Role role) {
+        if (manager.userExists(registerReq.getUsername())) {
             return false;
         }
-        manager.createUser(
-                User.builder()
-                        .passwordEncoder(this.encoder::encode)
-                        .password(register.getPassword())
-                        .username(register.getUsername())
-                        .roles(register.getRole().name())
-                        .build());
+
+        UserDetails userDetails = User.builder()
+                .password(encoder.encode(registerReq.getPassword()))
+                .username(registerReq.getUsername())
+                .roles(Role.USER.name())
+                .build();
+
+        manager.createUser(userDetails);
+
+        // update user's firstname, lastname, phone after added by manager
+        UserDto userDto = new UserDto();
+        userDto.setEmail(userDetails.getUsername());
+        userDto.setFirstName(registerReq.getFirstName());
+        userDto.setLastName(registerReq.getLastName());
+        userDto.setPhone(registerReq.getPhone());
+        userService.updateUser(userDto);
+
         return true;
     }
-
 }

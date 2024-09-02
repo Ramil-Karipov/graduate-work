@@ -10,9 +10,6 @@ CREATE TABLE users
 
 );
 
-
---changeSet eradomskaya:2
-
 CREATE TABLE images
 (
     pk         serial       NOT NULL PRIMARY KEY,
@@ -22,8 +19,6 @@ CREATE TABLE images
     media_type varchar(255) NOT NULL
 
 );
-
---changeSet eradomskaya:3
 
 CREATE TABLE ads
 (
@@ -36,10 +31,6 @@ CREATE TABLE ads
 
 );
 
-
-
---changeSet eradomskaya:4
-
 CREATE TABLE comments
 (
     pk         serial    NOT NULL PRIMARY KEY,
@@ -49,38 +40,3 @@ CREATE TABLE comments
     text       text      NOT NULL
 
 );
-
---changeSet amakarov:5
-
-ALTER TABLE users
-    ADD enabled boolean NOT NULL DEFAULT TRUE;
-
-ALTER TABLE users
-    DROP COLUMN role;
-
-CREATE TABLE authorities
-(
-    username VARCHAR(50) NOT NULL,
-    role VARCHAR(68) NOT NULL
-);
-
---changeSet amakarov:6
-
-ALTER TABLE users
-    ALTER COLUMN first_name DROP NOT NULL;
-
-ALTER TABLE users
-    ALTER COLUMN last_name DROP NOT NULL;
-
-ALTER TABLE users
-    ALTER COLUMN phone DROP NOT NULL;
-
---changeSet eradomskaya:7
-
-ALTER TABLE users
-    RENAME COLUMN email to username;
-
---changeSet eradomskaya:8
-
-ALTER TABLE authorities
-    RENAME COLUMN role to authority;

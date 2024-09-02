@@ -35,7 +35,7 @@ public class AdsServiceImpl implements AdsService {
 
     @Override
     public List<AdsDto> getALLAds() {
-        log.info("Trying to get all ads");
+        log.info("Trying to get all ads.sgl");
         List<Ads> allAds = adsRepository.findAll();
         if (allAds.isEmpty()) {
             log.warn("Ads not found");
@@ -59,7 +59,7 @@ public class AdsServiceImpl implements AdsService {
 
     @Override
     public List<AdsDto> getAdsMe(Boolean authenticated, String authority, Object credentials, Object details, Object principal) {
-        log.info("Trying to get all user's ads");
+        log.info("Trying to get all user's ads.sgl");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUser(authentication.getName());
         List<Ads> list = adsRepository.findAll();
@@ -74,8 +74,8 @@ public class AdsServiceImpl implements AdsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUser(authentication.getName());
         if (!ads.getAuthor().equals(user) && !userService.isAdmin(authentication)) {
-            log.warn("Unavailable to remove. It's not your ads! ads author = {}, username = {}", ads.getAuthor().getEmail(), user.getEmail());
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unavailable to remove. It's not your ads!");
+            log.warn("Unavailable to remove. It's not your ads.sgl! ads.sgl author = {}, username = {}", ads.getAuthor().getEmail(), user.getEmail());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unavailable to remove. It's not your ads.sgl!");
         }
         adsRepository.deleteById(id);
         log.info("The ad with id = {} was removed", id);
@@ -96,8 +96,8 @@ public class AdsServiceImpl implements AdsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUser(authentication.getName());
         if (!ads.getAuthor().equals(user) && !userService.isAdmin(authentication)) {
-            log.warn("Unavailable to update. It's not your ads! ads author = {}, username = {}", ads.getAuthor().getEmail(), user.getEmail());
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unavailable to update. It's not your ads!");
+            log.warn("Unavailable to update. It's not your ads.sgl! ads.sgl author = {}, username = {}", ads.getAuthor().getEmail(), user.getEmail());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unavailable to update. It's not your ads.sgl!");
         }
 
         Ads updatedAds = adsMapper.fromCreateAds(adsDto, user, ads.getImage());
@@ -125,11 +125,11 @@ public class AdsServiceImpl implements AdsService {
 
     /**
      * @param title - the parameter to search a title like...
-     * @return list of found ads
+     * @return list of found ads.sgl
      */
     @Override
     public List<AdsDto> findAds(String title, Sort.Direction order) {
-        log.info("Trying to find ads like {}", title);
+        log.info("Trying to find ads.sgl like {}", title);
         return toAdsDtoList(adsRepository.findByTitleLikeIgnoreCase("%" + title + "%", Sort.by(order, "title")));
     }
 

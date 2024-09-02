@@ -23,7 +23,7 @@ import java.util.List;
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("ads")
+@RequestMapping("ads.sgl")
 public class AdsController {
 
     private final AdsService adsService;

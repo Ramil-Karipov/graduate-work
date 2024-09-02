@@ -79,14 +79,14 @@ public class AdsCommentsServiceImpl implements AdsCommentsService {
         User user = userService.getUser(principalUser.getUsername());
         Ads ads = adsService.getAds(Integer.parseInt(adPk));
 
-        // An author of the ads should remove all commentaries I guess
+        // An author of the ads.sgl should remove all commentaries I guess
         if (!comment.getAuthor().equals(user) && !ads.getAuthor().equals(user) && !userService.isAdmin(authentication)) {
-            log.warn("Unavailable to update. It's not your comment! ads author = {}, comment author = {}, username = {}", ads.getAuthor().getEmail(), comment.getAuthor().getEmail(), user.getEmail());
+            log.warn("Unavailable to update. It's not your comment! ads.sgl author = {}, comment author = {}, username = {}", ads.getAuthor().getEmail(), comment.getAuthor().getEmail(), user.getEmail());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unavailable to update. It's not your comment!");
         }
 
         adsCommentsRepository.deleteById(id);
-        log.info("ads comment with id = {} was deleted", id);
+        log.info("ads.sgl comment with id = {} was deleted", id);
     }
 
     @Transactional
@@ -117,7 +117,7 @@ public class AdsCommentsServiceImpl implements AdsCommentsService {
         commentsModel.setPk(id);
         commentsModel.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
         adsCommentsRepository.save(commentsModel);
-        log.info("ads comment with id = {} was changed", id);
+        log.info("ads.sgl comment with id = {} was changed", id);
 
         return commentsMapper.toCommentsDto(commentsModel);
     }
@@ -129,7 +129,7 @@ public class AdsCommentsServiceImpl implements AdsCommentsService {
             log.warn("Comment does not exist");
             return new NotFoundException("Comment with id " + id + " does not exist");
         });
-        log.info("ads comment with id = {} was found", id);
+        log.info("ads.sgl comment with id = {} was found", id);
 
         return comments;
     }
